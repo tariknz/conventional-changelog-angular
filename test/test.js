@@ -18,12 +18,12 @@ betterThanBefore.setups([
     shell.mkdir('git-templates');
     shell.exec('git init --template=./git-templates');
 
-    gitDummyCommit('chore: first commit');
-    gitDummyCommit(['feat: amazing new module', 'BREAKING CHANGE: Not backward compatible.']);
-    gitDummyCommit(['fix(compile): avoid a bug', 'BREAKING CHANGE: The Change is huge.']);
-    gitDummyCommit(['perf(ngOptions): make it faster', ' closes #1, #2']);
-    gitDummyCommit('revert(ngOptions): bad commit');
-    gitDummyCommit('fix(*): oops');
+    gitDummyCommit('Merged PR 829: chore: first commit');
+    gitDummyCommit(['Merged PR 829: feat: amazing new module', 'BREAKING CHANGE: Not backward compatible.']);
+    gitDummyCommit(['Merged PR 829: fix(compile): avoid a bug', 'BREAKING CHANGE: The Change is huge.']);
+    gitDummyCommit(['Merged PR 829: perf(ngOptions): make it faster', ' closes #1, #2']);
+    gitDummyCommit('Merged PR 829: revert(ngOptions): bad commit');
+    gitDummyCommit('Merged PR 829: fix(*): oops');
   },
   function() {
     gitDummyCommit(['feat(awesome): addresses the issue brought up in #133']);

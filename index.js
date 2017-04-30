@@ -16,7 +16,7 @@ try {
 }
 
 var parserOpts = {
-  headerPattern: /^(\w*)(?:\((.*)\))?\: (.*)$/,
+  headerPattern: /^(?:Merged PR [0-9]*: )?(\w*)(?:\((.*)\))?\: (.*)$/,
   headerCorrespondence: [
     'type',
     'scope',
