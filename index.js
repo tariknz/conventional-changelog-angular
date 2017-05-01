@@ -42,6 +42,9 @@ var writerOpts = {
     var discard = true;
     var issues = [];
 
+    // remove the merged pr text
+    commit.header = commit.header.replace(new RegExp(/^Merged PR [0-9]*: /,''));
+
     commit.notes.forEach(function(note) {
       note.title = 'BREAKING CHANGES';
       discard = false;
