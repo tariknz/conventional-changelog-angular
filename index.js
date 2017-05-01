@@ -27,25 +27,43 @@ var parserOpts = {
   revertCorrespondence: ['header', 'hash']
 };
 
-function issueUrl() {
-  if (pkgJson.repository && pkgJson.repository.url && ~pkgJson.repository.url.indexOf('github.com')) {
-    var gitUrl = gufg(pkgJson.repository.url);
-
-    if (gitUrl) {
-      return gitUrl + '/issues/';
+function getRepoType() {
+  if (pkgJson.repository && pkgJson.repository.url) {
+    if (~pkgJson.repository.url.indexOf('github.com')) {
+      return 'github';
     }
+    if (~pkgJson.repository.url.indexOf('visualstudio.com')) {
+      return 'vstst';
+    }
+
+    return undefined;
   }
 }
 
+function issueUrl() {
+  var repoType = getRepoType();
+  switch (repoType) {
+    case 'github':
+      var gitUrl = gufg(pkgJson.repository.url);
+
+      if (gitUrl) {
+        return gitUrl + '/issues/';
+      }
+      break;
+    case 'vstst':
+      var projectUrl = pkgJson.repository.url.replace(/_git.+$/, '');
+      return projectUrl + '/_workitems?id=';
+  }
+
+  return undefined;
+}
+
 var writerOpts = {
-  transform: function(commit) {
+  transform: function (commit) {
     var discard = true;
     var issues = [];
 
-    // remove the merged pr text
-    commit.header = commit.header.replace(new RegExp(/^Merged PR [0-9]*: /,''));
-
-    commit.notes.forEach(function(note) {
+    commit.notes.forEach(function (note) {
       note.title = 'BREAKING CHANGES';
       discard = false;
     });
@@ -77,14 +95,14 @@ var writerOpts = {
     }
 
     if (typeof commit.hash === 'string') {
-      commit.hash = commit.hash.substring(0, 7);
+      commit.hash = commit.hash; //.substring(0, 7);
     }
 
     if (typeof commit.subject === 'string') {
       var url = issueUrl();
       if (url) {
         // GitHub issue URLs.
-        commit.subject = commit.subject.replace(/#([0-9]+)/g, function(_, issue) {
+        commit.subject = commit.subject.replace(/#([0-9]+)/g, function (_, issue) {
           issues.push(issue);
           return '[#' + issue + '](' + url + issue + ')';
         });
@@ -95,7 +113,7 @@ var writerOpts = {
     }
 
     // remove references that already appear in the subject
-    commit.references = commit.references.filter(function(reference) {
+    commit.references = commit.references.filter(function (reference) {
       if (issues.indexOf(reference.issue) === -1) {
         return true;
       }
@@ -118,7 +136,7 @@ module.exports = Q.all([
   readFile(resolve(__dirname, 'templates/commit.hbs'), 'utf-8'),
   readFile(resolve(__dirname, 'templates/footer.hbs'), 'utf-8')
 ])
-  .spread(function(template, header, commit, footer) {
+  .spread(function (template, header, commit, footer) {
 
     writerOpts.mainTemplate = template;
     writerOpts.headerPartial = header;
