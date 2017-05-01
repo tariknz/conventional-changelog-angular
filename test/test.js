@@ -26,27 +26,30 @@ betterThanBefore.setups([
     gitDummyCommit('Merged PR 829: fix(*): oops');
   },
   function() {
-    gitDummyCommit(['feat(awesome): addresses the issue brought up in #133']);
+    gitDummyCommit(['Merged PR 829: feat(awesome): addresses the issue brought up in #133']);
   },
   function() {
-    gitDummyCommit(['feat(awesome): fix #88']);
+    gitDummyCommit(['Merged PR 829: feat(awesome): fix #88']);
   },
   function() {
-    gitDummyCommit(['feat(awesome): issue brought up by @bcoe! on Friday']);
+    gitDummyCommit(['Merged PR 829: feat(awesome): issue brought up by @bcoe! on Friday']);
   },
   function() {
-    gitDummyCommit(['docs(readme): make it clear', 'BREAKING CHANGE: The Change is huge.']);
-    gitDummyCommit(['style(whitespace): make it easier to read', 'BREAKING CHANGE: The Change is huge.']);
-    gitDummyCommit(['refactor(code): change a lot of code', 'BREAKING CHANGE: The Change is huge.']);
-    gitDummyCommit(['test(*): more tests', 'BREAKING CHANGE: The Change is huge.']);
-    gitDummyCommit(['chore(deps): bump', 'BREAKING CHANGE: The Change is huge.']);
+    gitDummyCommit(['Merged PR 829: docs(readme): make it clear', 'BREAKING CHANGE: The Change is huge.']);
+    gitDummyCommit(['Merged PR 829: style(whitespace): make it easier to read', 'BREAKING CHANGE: The Change is huge.']);
+    gitDummyCommit(['Merged PR 829: refactor(code): change a lot of code', 'BREAKING CHANGE: The Change is huge.']);
+    gitDummyCommit(['Merged PR 829: test(*): more tests', 'BREAKING CHANGE: The Change is huge.']);
+    gitDummyCommit(['Merged PR 829: chore(deps): bump', 'BREAKING CHANGE: The Change is huge.']);
   },
   function() {
-    gitDummyCommit(['feat(deps): bump', 'BREAKING CHANGES: Also works :)']);
+    gitDummyCommit(['Merged PR 829: feat(deps): bump', 'BREAKING CHANGES: Also works :)']);
   },
   function() {
     shell.exec('git tag v1.0.0');
-    gitDummyCommit('feat: some more features');
+    gitDummyCommit('Merged PR 829: feat: some more features');
+  },
+  function() {
+    gitDummyCommit('Merged PR 829: feat(cool-scope): some more features closes #1234');
   }
 ]);
 
@@ -83,7 +86,6 @@ describe('angular preset', function() {
         expect(chunk).to.not.include('revert');
         expect(chunk).to.not.include('***:**');
         expect(chunk).to.not.include(': Not backward compatible.');
-
         done();
       }));
   });
@@ -220,6 +222,34 @@ describe('angular preset', function() {
 
         expect(chunk).to.include('(http://unknown/compare');
         expect(chunk).to.include('](http://unknown/commits/');
+
+        i++;
+        cb();
+      }, function() {
+        expect(i).to.equal(1);
+        done();
+      }));
+  });
+
+it('should work with vstst host', function(done) {
+    preparing(8);
+    var i = 0;
+
+    conventionalChangelogCore({
+      config: preset,
+      pkg: {
+        path: __dirname + '/fixtures/_vstst-host.json'
+      }
+    }, { commit: 'commit' })
+      .on('error', function(err) {
+        done(err);
+      })
+      .pipe(through(function(chunk, enc, cb) {
+        chunk = chunk.toString();
+        console.log(chunk);
+
+        expect(chunk).to.include('(https://testing.visualstudio.com/testing-project/_git/testing-repo/compare');
+        expect(chunk).to.include('](https://testing.visualstudio.com/testing-project/_git/testing-repo/commit/');
 
         i++;
         cb();
